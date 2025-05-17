@@ -1,7 +1,9 @@
+import { useForm } from 'react-hook-form';
+
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { useForm } from 'react-hook-form';
+import { AuthService } from '@/services/AuthService';
 
 interface IFormData {
   email: string;
@@ -16,8 +18,9 @@ export function SignIn() {
     },
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    console.log('Sign in data:', data);
+  const handleSubmit = form.handleSubmit(async ({ email, password }) => {
+    const { accessToken, refreshToken } = await AuthService.signIn({ email, password });
+    console.log({ accessToken, refreshToken });
   });
 
   return (
