@@ -23,7 +23,7 @@ export function Home() {
   const [isLoading] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col max-w-[800px] mx-auto justify-center">
+    <div className="min-h-screen px-10 flex flex-col max-w-[800px] mx-auto justify-center">
       <h1 className="text-3xl font-semibold">Bem-vindo(a) ao Dashboard!</h1>
       <h2 className="text-muted-foreground">Estes são os seus pedidos:</h2>
 
