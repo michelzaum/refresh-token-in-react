@@ -1,26 +1,25 @@
 import { Skeleton } from '@/components/ui/Skeleton';
-import { useState } from 'react';
-
-const orders = [
-  {
-    id: crypto.randomUUID(),
-    orderNumber: '#001',
-    date: Date.now()
-  },
-  {
-    id: crypto.randomUUID(),
-    orderNumber: '#002',
-    date: Date.now()
-  },
-  {
-    id: crypto.randomUUID(),
-    orderNumber: '#003',
-    date: Date.now()
-  },
-];
+import { IOrder } from '@/entities/IOrder';
+import { toast } from '@/hooks/use-toast';
+import { OrdersService } from '@/services/OrdersService';
+import { useEffect, useState } from 'react';
 
 export function Home() {
-  const [isLoading] = useState(false);
+  const [orders, setOrders] = useState<IOrder[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    OrdersService.getOrders()
+      .then(setOrders)
+      .catch(() => {
+        toast({
+          title: 'Erro ao carregar os pedidos',
+        });
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   return (
     <div className="min-h-screen px-10 flex flex-col max-w-[800px] mx-auto justify-center">

@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useState } from 'react';
 import { AuthService } from '@/services/AuthService';
+import { storageKeys } from '@/config/storageKeys';
 
 interface IAuthContextValue {
   signedIn: boolean;
@@ -10,14 +11,14 @@ export const AuthContext = createContext({} as IAuthContextValue);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [signedIn, setSignedIn] = useState(() => {
-    return !!localStorage.getItem('live019:accessToken');
+    return !!localStorage.getItem(storageKeys.accessToken);
   });
 
   const signIn = useCallback(async (email: string, password: string) => {
     const { accessToken, refreshToken } = await AuthService.signIn({ email, password });
 
-    localStorage.setItem('live019:accessToken', accessToken);
-    localStorage.setItem('live019:refreshToken', refreshToken);
+    localStorage.setItem(storageKeys.accessToken, accessToken);
+    localStorage.setItem(storageKeys.refreshToken, refreshToken);
 
     setSignedIn(true);
   }, []);
