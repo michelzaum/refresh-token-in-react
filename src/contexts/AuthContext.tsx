@@ -1,7 +1,8 @@
-import { storageKeys } from '@/config/storageKeys';
+import React, { createContext, useCallback, useLayoutEffect, useState } from 'react';
+
 import { AuthService } from '@/services/AuthService';
+import { storageKeys } from '@/config/storageKeys';
 import { httpClient } from '@/services/httpClient';
-import { createContext, useCallback, useLayoutEffect, useState } from 'react';
 
 interface IAuthContextValue {
   signedIn: boolean;
@@ -17,12 +18,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   useLayoutEffect(() => {
-    console.log('Add request interceptor');
-
     const interceptorId = httpClient.interceptors.request.use(
       (config) => {
-        console.log(config.url);
-
         const accessToken = localStorage.getItem(storageKeys.accessToken);
 
         if (accessToken) {
@@ -39,8 +36,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useLayoutEffect(() => {
-    console.log('Add response interceptor');
-
     const interceptorId = httpClient.interceptors.response.use(
       (response) => response,
       async (error) => {
@@ -53,20 +48,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return Promise.reject(error);
         }
 
-        if (error.response?.status !== 401 || !refreshToken) {
+        if ((error.response && error.response.status !== 401) || !refreshToken) {
           return Promise.reject(error);
         }
 
-        const {
-          accessToken,
-          refreshToken: newRefreshToken
-        } = await AuthService.refreshToken(refreshToken);
+        const { accessToken, refreshToken: newRefreshToken } = await AuthService.refreshToken(refreshToken);
 
         localStorage.setItem(storageKeys.accessToken, accessToken);
         localStorage.setItem(storageKeys.refreshToken, newRefreshToken);
 
         return httpClient(originalRequest);
-      }
+      },
     );
 
     return () => {
@@ -75,10 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const { accessToken, refreshToken } = await AuthService.signIn({
-      email,
-      password,
-    });
+    const { accessToken, refreshToken } = await AuthService.signIn({ email, password });
 
     localStorage.setItem(storageKeys.accessToken, accessToken);
     localStorage.setItem(storageKeys.refreshToken, refreshToken);

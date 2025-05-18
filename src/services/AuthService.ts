@@ -1,12 +1,12 @@
 import { httpClient } from './httpClient';
 
-interface ISignUpDTO {
+interface ISignUpDto {
   name: string;
   email: string;
   password: string;
 }
 
-interface ISignInDTO {
+interface ISignInDto {
   email: string;
   password: string;
 }
@@ -17,20 +17,17 @@ interface ISignInResponse {
 }
 
 export class AuthService {
-  static async signUp({ name, email, password }: ISignUpDTO) {
+  static async signUp({ name, email, password }: ISignUpDto) {
     const { data } = await httpClient.post('/signup', {
-      name,
-      email,
-      password,
+      name, email, password,
     });
 
     return data;
   }
 
-  static async signIn({ email, password }: ISignInDTO) {
+  static async signIn({ email, password }: ISignInDto) {
     const { data } = await httpClient.post<ISignInResponse>('/signin', {
-      email,
-      password,
+      email, password,
     });
 
     return data;

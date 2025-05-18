@@ -1,9 +1,10 @@
+import { useForm } from 'react-hook-form';
+
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { useAuth } from '@/hooks/useAuth';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/use-toast';
 
 interface IFormData {
   email: string;
@@ -12,7 +13,7 @@ interface IFormData {
 
 export function SignIn() {
   const { signIn } = useAuth();
-
+  const { toast } = useToast();
   const form = useForm<IFormData>({
     defaultValues: {
       email: '',
@@ -24,7 +25,10 @@ export function SignIn() {
     try {
       await signIn(email, password);
     } catch {
-      toast.error('Credenciais inválidas!');
+      toast({
+        title: 'Credenciais inválidas',
+        variant: 'destructive',
+      });
     }
   });
 
@@ -44,8 +48,7 @@ export function SignIn() {
         </div>
 
         <Button className="mt-3" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting && 'Entrando...'}
-          {!form.formState.isSubmitting && 'Entrar'}
+          {form.formState.isSubmitting ? 'Entrando' : 'Entrar'}
         </Button>
       </form>
     </div>

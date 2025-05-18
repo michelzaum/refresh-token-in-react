@@ -1,8 +1,9 @@
+import { useForm } from 'react-hook-form';
+
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { AuthService } from '@/services/AuthService';
-import { useForm } from 'react-hook-form';
 
 interface IFormData {
   name: string;
@@ -22,9 +23,7 @@ export function SignUp() {
   });
 
   const handleSubmit = form.handleSubmit(async ({ name, email, password }) => {
-    const response = await AuthService.signUp({ name, email, password });
-
-    console.log(response);
+    await AuthService.signUp({ name, email, password });
   });
 
   return (

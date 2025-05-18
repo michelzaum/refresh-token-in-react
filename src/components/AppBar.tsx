@@ -1,11 +1,10 @@
 import { LogOutIcon } from 'lucide-react';
-
-import { useAuth } from '@/hooks/useAuth';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { Button } from './ui/Button';
 import { Tooltip } from './ui/Tooltip';
+import { useAuth } from '@/hooks/useAuth';
 
-export function Appbar() {
+export function AppBar() {
   const { signedIn, signOut } = useAuth();
 
   return (
@@ -14,12 +13,7 @@ export function Appbar() {
 
       {signedIn && (
         <Tooltip content="Sair">
-          <Button
-            variant="secondary"
-            size="icon"
-            className="rounded-full"
-            onClick={signOut}
-          >
+          <Button variant="secondary" size="icon" className="rounded-full" onClick={signOut}>
             <LogOutIcon className='w4 h-4' />
           </Button>
         </Tooltip>
