@@ -1,4 +1,5 @@
-import React, { createContext, useCallback, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useLayoutEffect, useState } from 'react';
+
 import { AuthService } from '@/services/AuthService';
 import { storageKeys } from '@/config/storageKeys';
 import { httpClient } from '@/services/httpClient';
@@ -16,7 +17,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return !!localStorage.getItem(storageKeys.accessToken);
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const interceptorId = httpClient.interceptors.request.use(
       (config) => {
         const accessToken = localStorage.getItem(storageKeys.accessToken);
@@ -31,6 +32,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       httpClient.interceptors.request.eject(interceptorId);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    const interceptorId = httpClient.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+        const refreshToken = localStorage.getItem(storageKeys.refreshToken);
+
+        if (originalRequest.url === '/refresh-token') {
+          setSignedIn(false);
+          localStorage.clear();
+          return Promise.reject(error);
+        }
+
+        if ((error.response && error.response.status !== 401) || !refreshToken) {
+          return Promise.reject(error);
+        }
+
+        const { accessToken, refreshToken: newRefreshToken } = await AuthService.refreshToken(refreshToken);
+
+        localStorage.setItem(storageKeys.accessToken, accessToken);
+        localStorage.setItem(storageKeys.refreshToken, newRefreshToken);
+
+        return httpClient(originalRequest);
+      },
+    );
+
+    return () => {
+      httpClient.interceptors.response.eject(interceptorId);
     };
   }, []);
 
