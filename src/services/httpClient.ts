@@ -7,18 +7,6 @@ export const httpClient = axios.create({
   baseURL: 'http://localhost:3000',
 });
 
-httpClient.interceptors.request.use(
-  (config) => {
-    const accessToken = localStorage.getItem(storageKeys.accessToken);
-
-    if (accessToken) {
-      config.headers.set('Authorization', `Bearer ${accessToken}`);
-    }
-
-    return config;
-  },
-);
-
 httpClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -26,7 +14,6 @@ httpClient.interceptors.response.use(
     const refreshToken = localStorage.getItem(storageKeys.refreshToken);
 
     if (originalRequest.url === '/refresh-token') {
-      window.location.href = '/sign-in';
       localStorage.clear();
       return Promise.reject(error);
     }
