@@ -22,13 +22,18 @@ httpClient.interceptors.request.use(
 httpClient.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const originalRequest = error.config;
     const refreshToken = localStorage.getItem(storageKeys.refreshToken);
+
+    if (originalRequest.url === '/refresh-token') {
+      window.location.href = '/sign-in';
+      localStorage.clear();
+      return Promise.reject(error);
+    }
 
     if ((error.response && error.response.status !== 401) || !refreshToken) {
       return Promise.reject(error);
     }
-
-    const originalRequest = error.config;
 
     const { accessToken, refreshToken: newRefreshToken } = await AuthService.refreshToken(refreshToken);
 
